@@ -244,12 +244,15 @@ mtit = 'Probability of Event Vs. Maximum SSN'
 pl.ssn = ggplot(pEventXyears_ssn_df) + geom_point(aes(x = ssn_max, y = median/100., color = xcrit),  size = 4) + 
   geom_errorbar(aes(x = ssn_max, ymin = low/100., ymax = high/100., color = xcrit), alpha = 0.8, width = 0.2) +
   scale_y_continuous(name = 'Probability') +
-  scale_x_continuous(name = 'Maximum SSN [per cycle]', breaks = seq(from=100, to = 300, by = 25)) + ggtitle(mtit) + #, breaks = 0:(ncycle-1), labels = x_labels
-  guides(color = guide_legend(title = "Xcrit [nT]"),size = guide_legend(18)) +
-  theme(axis.text.x=element_text(size=18), axis.text.y=element_text(size=18), axis.title.x=element_text(size=18), axis.title.y=element_text(size=18), axis.title=element_text(size=18)) +
+  scale_x_continuous(name = 'Maximum SSN [per cycle]', breaks = seq(from=100, to = 300, by = 25)) + ggtitle(mtit) + 
+  guides(color = guide_legend(title = "Xcrit [nT]"),size = guide_legend(14)) +
+  theme(axis.text.x=element_text(size=14), axis.text.y=element_text(size=14), axis.title.x=element_text(size=14), axis.title.y=element_text(size=18), axis.title=element_text(size=14)) +
   geom_smooth(data = pEventXyears_ssn_df, method = 'lm', formula=(y~x), aes(x= ssn_max, y = median/100, color = xcrit), stat = 'smooth', span = 1)
 
-pl.ssn 
+fname = paste0(dirname(mypath),'/plots/figure6.png')
+ggsave(fname, pl.ssn, width = 12, height = 7, units = 'in')
+
+cat('\nSaved Plot at: ', fname,'\n')
 
 #  =====================================================
 

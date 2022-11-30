@@ -319,12 +319,16 @@ for (ii in 1:(ncycle-1)) {
 }
 
 
-# This is a big plot with lots of panels.  You may need to copy and paste the command below again to see it
+# This is a big plot with lots of panels
 
 
 mp = grid.arrange(grobs = pl.clauset,
                   nrow = 4,
                   ncol = 4)
 
+fname = paste0(dirname(mypath),'/plots/figure3.png')
+ggsave(fname, mp, width = 30, height = 20, units = 'in')
+
+cat('\nSaved Plot at: ', fname,'\n')
 # =====================================================
 

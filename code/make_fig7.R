@@ -196,10 +196,13 @@ mtit = paste0('Return Period vs. Max SSN of each cycle')
 pl.rl.ssn.logy = ggplot(returnlevel_df) + geom_point(aes(x = ssn, y = return_period, color = xcrit),  size = 4) + 
   scale_y_continuous(name = 'Return Period [years]', trans = "log10") +
   scale_x_continuous(name = 'Maximum SSN [per cycle]', breaks = seq(from=100, to = 300, by = 25)) + ggtitle(mtit) + 
-  guides(color = guide_legend(title = "Xcrit [nT]"),size = guide_legend(18)) +
-  theme(axis.text.x=element_text(size=18), axis.text.y=element_text(size=18), axis.title.x=element_text(size=18), axis.title.y=element_text(size=18), axis.title=element_text(size=18)) 
+  guides(color = guide_legend(title = "Xcrit [nT]"),size = guide_legend(14)) +
+  theme(axis.text.x=element_text(size=14), axis.text.y=element_text(size=14), axis.title.x=element_text(size=18), axis.title.y=element_text(size=18), axis.title=element_text(size=14)) 
 
-pl.rl.ssn.logy
 
+fname = paste0(dirname(mypath),'/plots/figure7.png')
+ggsave(fname, pl.rl.ssn.logy, width = 12, height = 7, units = 'in')
+
+cat('\nSaved Plot at: ', fname,'\n')
 # =====================================================
 

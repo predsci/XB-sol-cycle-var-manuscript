@@ -197,4 +197,8 @@ for (ii in 1:ncrit) {
 
 mp = grid.arrange(grobs = pl, nrow = 3,ncol = 2)
 
+fname = paste0(dirname(mypath),'/plots/figure4.png')
+ggsave(fname, mp, width = 20, height = 12, units = 'in')
+
+cat('\nSaved Plot at: ', fname,'\n')
 #  =====================================================

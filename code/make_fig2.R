@@ -229,4 +229,8 @@ pl.stat[[2]] <- ggplot() +
 
 mp = grid.arrange(grobs = pl.stat, ncol = 2, nrow = 1)
 
+fname = paste0(dirname(mypath),'/plots/figure2.png')
+ggsave(fname, mp, width = 12, height = 5, units = 'in')
+
+cat('\nSaved Plot at: ', fname,'\n')
 # =====================================================

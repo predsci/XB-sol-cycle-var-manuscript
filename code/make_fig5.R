@@ -198,11 +198,14 @@ pl.all = ggplot(pEventXyears_df_all) + geom_point(aes(x = x, y = median/100., co
   geom_errorbar(aes(x = x, ymin = low/100., ymax = high/100., color = xcrit), alpha = 0.8, width = 0.1) +
   scale_y_continuous(name = 'Probability') +
   scale_x_continuous(name = 'Years', breaks = 0:(ncycle-1), labels = x_labels) + ggtitle(mtit) +
-  guides(color = guide_legend(title = "Xcrit [nT]"),size = guide_legend(18)) +
-  theme(axis.text.x=element_text(size=18), axis.text.y=element_text(size=18), axis.title.x=element_text(size=18), axis.title.y=element_text(size=18), axis.title=element_text(size=18))
+  guides(color = guide_legend(title = "Xcrit [nT]"),size = guide_legend(14)) +
+  theme(axis.text.x=element_text(size=14), axis.text.y=element_text(size=14), axis.title.x=element_text(size=14), axis.title.y=element_text(size=18), axis.title=element_text(size=14))
 
-pl.all
 
+fname = paste0(dirname(mypath),'/plots/figure5.png')
+ggsave(fname, pl.all, width = 12, height = 7, units = 'in')
+
+cat('\nSaved Plot at: ', fname,'\n')
 # =====================================================
 
 

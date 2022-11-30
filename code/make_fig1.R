@@ -225,3 +225,10 @@ pl[[3]] <- ggplot() +
 ggtitle("Monthly SSN data and Dst Storms")
 
 mp = grid.arrange(grobs = pl,nrow = 3, ncol = 1)
+
+fname = paste0(dirname(mypath),'/plots/figure1.png')
+ggsave(fname, mp, width = 8, height = 11, units = 'in')
+
+cat('\nSaved Plot at: ', fname,'\n')
+# =====================================================
+
