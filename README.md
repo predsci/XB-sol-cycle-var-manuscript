@@ -13,7 +13,7 @@ After cloning the repository:
 
 Start RStudio and now you can generate each figure using:
 
->source('max_figX.R') where X =1,2,..,7
+>source('make_figX.R') where X =1,2,..,7
 
 
 For comments or questions please email us at: pete@predsci.com, mbennun@predsci.com 
