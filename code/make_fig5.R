@@ -13,7 +13,7 @@ library(gridExtra)
 source('util.R')
 
 # ===================================
-# create the 10 -year prob of exceeding event 
+# create the 10 -year prob of exceeding event
 # ===================================
 
 mypath = getwd()
@@ -49,7 +49,7 @@ df_dcx_realt = read_prov_realtime_data(filename)
 df_dcx_total = rbind(df_dcx, df_dcx_prov, df_dcx_realt)
 
 # =====================================================
-# calculate storms 
+# calculate storms
 # =====================================================
 
 evntThreshold <- -20.
@@ -64,7 +64,7 @@ df_storm = data
 
 df_dcx = df_dcx_total
 
-df_storm_dcx =df_storm 
+df_storm_dcx =df_storm
 
 # =====================================================
 # start year and month of each cycle and cycle number
@@ -85,25 +85,24 @@ cycle_day = rep(15, ncycle)
 
 cycle_date = ISOdate(cycle_year, cycle_month, cycle_day, hour = rep(12, ncycle), tz = 'UTC')
 
-# there is a total of 9 complete cycles.  We are now in the 10th one 
-# we will analyse one by one and also anlayse the entire Dcx data set 
+# there is a total of 9 complete cycles.  We are now in the 10th one
+# we will analyse one by one and also anlayse the entire Dcx data set
 
 date_breaks <- "10 years"
 
 inp.xcrit <- NULL
 dt <- 10
 yaxmax = 1
-boot = 500
+boot = 1e4
 bootShow = 10
 
 continous <- TRUE
 
-
 input.var = "Dcx"
 
-# calculate the 10 year probability of exceeding each of these events for each cycle and for all 
+# calculate the 10 year probability of exceeding each of these events for each cycle and for all
 
-xcrit_vec = c(400, 500, 600) 
+xcrit_vec = c(400, 500, 600)
 
 ncrit = length(xcrit_vec)
 
@@ -116,18 +115,18 @@ icount = 0
 for (jj in 1:ncrit) {
 
 	inp.xcrit <- xcrit_vec[jj]
-	
+
 	cat("Processing Xcrit of ", inp.xcrit, ' [nT]\n')
 	for (ii in 1:ncycle) {
 
 	  ii1m = ii - 1
 		ii1  = ii + 1
-		
+
 		if (ii == 1) {
 			data = df_storm_dcx
 			date_start = data[1, "evnt_time"]
 			date_end = max(data[, "evnt_time"])
-			cycle_years = "ALL" 
+			cycle_years = "ALL"
 			cat('Start and End dates for cycle ALL\n')
 		} else {
 			data = df_storm_dcx
@@ -162,7 +161,7 @@ for (jj in 1:ncrit) {
 		pEventXyears_df[ii, "years"] = cycle_years
 
 	}
-	
+
 	pEventXyears_df_list[[jj]] = pEventXyears_df
 }
 
@@ -191,10 +190,10 @@ pEventXyears_df_all$x = rep(c(0, 1:(ncycle-1)), ncrit)
 pEventXyears_df_all$xcrit = as.character(rep(xcrit_vec, each = ncycle))
 
 # labels for x-axis
-x_labels = unique(pEventXyears_df_all$years) 
+x_labels = unique(pEventXyears_df_all$years)
 
 
-pl.all = ggplot(pEventXyears_df_all) + geom_point(aes(x = x, y = median/100., color = xcrit),  size = 4) + 
+pl.all = ggplot(pEventXyears_df_all) + geom_point(aes(x = x, y = median/100., color = xcrit),  size = 4) +
   geom_errorbar(aes(x = x, ymin = low/100., ymax = high/100., color = xcrit), alpha = 0.8, width = 0.1) +
   scale_y_continuous(name = 'Probability') +
   scale_x_continuous(name = 'Years', breaks = 0:(ncycle-1), labels = x_labels) + ggtitle(mtit) +
@@ -206,6 +205,11 @@ fname = paste0(dirname(mypath),'/plots/figure5.png')
 ggsave(fname, pl.all, width = 12, height = 7, units = 'in')
 
 cat('\nSaved Plot at: ', fname,'\n')
+
+fname = paste0(dirname(mypath),'/plots/data_figure5.csv')
+write.csv(pEventXyears_df_all, file=fname)
+
+cat('\nSaved Data at: ', fname,'\n')
 # =====================================================
 
 

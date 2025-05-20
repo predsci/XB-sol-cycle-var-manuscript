@@ -9,18 +9,23 @@ library(dplyr)
 library(gridExtra)
 library(reshape2)
 
+# source('/Users/pete/Dropbox/research/XB-2024/util.R')
 source('util.R')
 
 # ================================
-# Plot Dcx/Dxt/Dst and SSN 
+# Plot Dcx/Dxt/Dst and SSN
 # ================================
 
 var_vec = c('Dcx', 'Dxt', 'Dst')
 
+# This is in Michal's original, but then must run Rstudio from specific DIR
+#mypath = getwd()
+
+# mypath = "/Users/pete/Dropbox/NAPR08/oulu_data/XB-sol-cycle-var-manuscript"
 mypath = getwd()
 
 data_dir = paste0(dirname(mypath),'/data/')
-                  
+
 nvar = length(var_vec)
 
 df_list = list()
@@ -30,54 +35,54 @@ df_list = list()
 # ================================
 
 for (ii in 1:nvar) {
-  
+
   var = var_vec[ii]
-  
+
   cat("Reading ", var, ' Data \n')
   if (ii < nvar) {
-    
-    
+
+
     # past data
     filename = paste0(data_dir,var,'.mat')
-    
+
     df = read_mat_data(filename)
-    
+
     # provisional data
-    
+
     filename = paste0(data_dir,var,'_provisional.txt')
-    
+
     df_prov = read_prov_realtime_data(filename)
-    
+
     # realtime data
-    
+
     filename = paste0(data_dir,var,'_realtime.txt')
-    
+
     df_realt = read_prov_realtime_data(filename)
-    
+
     # merge the data frames
-    
+
     df_total = rbind(df, df_prov, df_realt)
-    
+
   } else {
-    
+
     filename = paste0(data_dir, var,'.txt')
-    
+
     df = read_prov_realtime_data(filename)
-    
+
     # now read data from kyoto Starting from Jan 1, 2015 todate
-    
+
     filename = paste0(data_dir, var,'.kyoto.iaga2002.txt')
 
     df_kyoto = read_kyoto_data(filename)
-    
+
     df_total = rbind(df, df_kyoto)
   }
-  
+
   df_list[[ii]] = df_total
 }
 
 # =====================================================
-# calculate storms 
+# calculate storms
 # =====================================================
 
 evntThreshold <- -20.
@@ -104,7 +109,7 @@ df_storm_dxt = df_storm_list[[2]]
 df_storm_dst = df_storm_list[[3]]
 
 # =====================================================
-# read the sun-spot data 
+# read the sun-spot data
 # =====================================================
 
 filename = paste0(data_dir,'/SN_ms_tot_V2.0.txt')
@@ -157,71 +162,71 @@ pl = list()
 # First for Dcx
 
 pl[[1]] <- ggplot() +
-  geom_line(data = df_ssn, aes(x = datetime, y=ssn, color = ssnColor), size =2) + 
+  geom_line(data = df_ssn, aes(x = datetime, y=ssn, color = ssnColor), size =2) +
   geom_segment(data = df_storm_dcx, aes(x = evnt_time, xend = evnt_time, y=0, yend= -evnt/ coeff, color = valColor)) + # Divide by 10 to get the same range than the temperature
-  scale_x_datetime(name = '') + 
+  scale_x_datetime(name = '') +
   scale_y_continuous(
-    
+
     # Features of the first axis
     name = "SSN Monthly ",
-    
+
     # Add a second axis and specify its features
     sec.axis = sec_axis(~.*coeff, name="Dcx Storms [nT]")
   )+
-  
+
   theme(
     axis.title.y.left = element_text(color = valColor, size=13),
     axis.title.y.right = element_text(color = ssnColor, size=13),
     legend.position = 'none'
   ) +
-  
+
   ggtitle("Monthly SSN data and Dcx Storms") +
   annotate(geom ='text', x=(cycle_date[1:8]+60*60*24*1200), y= rep(200, 8), label = cycle_num, color = 'black')
 
 # Second for Dxt
 
 pl[[2]] <- ggplot() +
-  geom_line(data = df_ssn, aes(x = datetime, y=ssn, color = ssnColor), size =2) + 
+  geom_line(data = df_ssn, aes(x = datetime, y=ssn, color = ssnColor), size =2) +
   geom_segment(data = df_storm_dxt, aes(x = evnt_time, xend = evnt_time, y=0, yend= -evnt/ coeff, color = valColor)) + # Divide by 10 to get the same range than the temperature
-  scale_x_datetime(name = '') + 
+  scale_x_datetime(name = '') +
   scale_y_continuous(
-    
+
     # Features of the first axis
     name = "SSN Monthly ",
-    
+
     # Add a second axis and specify its features
     sec.axis = sec_axis(~.*coeff, name="Dxt Storms [nT]")
   )+
-  
+
   theme(
     axis.title.y.left = element_text(color = valColor, size=13),
     axis.title.y.right = element_text(color = ssnColor, size=13),
     legend.position = 'none'
   ) +
-  
+
   ggtitle("Monthly SSN data and Dxt Storms")
 
 # Third for Dst
 
 pl[[3]] <- ggplot() +
-  geom_line(data = df_ssn, aes(x = datetime, y=ssn, color = ssnColor), size =2) + 
+  geom_line(data = df_ssn, aes(x = datetime, y=ssn, color = ssnColor), size =2) +
   geom_segment(data = df_storm_dst, aes(x = evnt_time, xend = evnt_time, y=0, yend= -evnt/ coeff, color = valColor)) + # Divide by 10 to get the same range than the temperature
-  scale_x_datetime(name = '') + 
+  scale_x_datetime(name = '') +
   scale_y_continuous(
-    
+
     # Features of the first axis
     name = "SSN Monthly ",
-    
+
     # Add a second axis and specify its features
     sec.axis = sec_axis(~.*coeff, name="Dst Storms [nT]")
   )+
-  
+
   theme(
     axis.title.y.left = element_text(color = valColor, size=13),
     axis.title.y.right = element_text(color = ssnColor, size=13),
     legend.position = 'none'
   ) +
-  
+
 ggtitle("Monthly SSN data and Dst Storms")
 
 mp = grid.arrange(grobs = pl,nrow = 3, ncol = 1)

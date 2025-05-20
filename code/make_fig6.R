@@ -12,7 +12,7 @@ library(gridExtra)
 source('util.R')
 
 # ===================================
-# create the 10 -year prob of exceeding event 
+# create the 10 -year prob of exceeding event
 # ===================================
 
 mypath = getwd()
@@ -48,7 +48,7 @@ df_dcx_realt = read_prov_realtime_data(filename)
 df_dcx_total = rbind(df_dcx, df_dcx_prov, df_dcx_realt)
 
 # =====================================================
-# calculate storms 
+# calculate storms
 # =====================================================
 
 evntThreshold <- -20.
@@ -63,7 +63,7 @@ df_storm = data
 
 df_dcx = df_dcx_total
 
-df_storm_dcx =df_storm 
+df_storm_dcx =df_storm
 
 # =====================================================
 # start year and month of each cycle and cycle number
@@ -84,24 +84,24 @@ cycle_day = rep(15, ncycle)
 
 cycle_date = ISOdate(cycle_year, cycle_month, cycle_day, hour = rep(12, ncycle), tz = 'UTC')
 
-# there is a total of 9 complete cycles.  We are now in the 10th one 
-# we will analyse one by one and also anlayse the entire Dcx data set 
+# there is a total of 9 complete cycles.  We are now in the 10th one
+# we will analyse one by one and also anlayse the entire Dcx data set
 
 date_breaks <- "10 years"
 
 inp.xcrit <- NULL
 dt <- 10
 yaxmax = 1
-boot = 500
+boot = 1e4
 bootShow = 10
 
 continous <- TRUE
 
 input.var = "Dcx"
 
-# calculate the 10 year probability of exceeding each of these events for each cycle and for all 
+# calculate the 10 year probability of exceeding each of these events for each cycle and for all
 
-xcrit_vec =  c(400, 500, 600) 
+xcrit_vec =  c(400, 500, 600)
 
 ncrit = length(xcrit_vec)
 
@@ -114,18 +114,18 @@ icount = 0
 for (jj in 1:ncrit) {
 
 	inp.xcrit <- xcrit_vec[jj]
-	
+
 	cat("Processing Xcrit of ", inp.xcrit, ' [nT]\n')
 	for (ii in 1:ncycle) {
 
 	  ii1m = ii - 1
 		ii1  = ii + 1
-		
+
 		if (ii == 1) {
 		  data = df_storm_dcx
 		  date_start = data[1, "evnt_time"]
 		  date_end = max(data[, "evnt_time"])
-		  cycle_years = "ALL" 
+		  cycle_years = "ALL"
 		  cat('Start and End dates for cycle ALL\n')
 		} else {
 		  data = df_storm_dcx
@@ -135,7 +135,7 @@ for (jj in 1:ncrit) {
 		  cycle_years = paste0(as.character(cycle_year[ii1m]), "-", as.character(cycle_year[ii]))
 		  cat('Start and End dates for cycle ', cycle_num[ii1m],'\n')
 		}
-		
+
 		print(date_start)
 		print(date_end)
 
@@ -160,7 +160,7 @@ for (jj in 1:ncrit) {
 		pEventXyears_df[ii, "years"] = cycle_years
 
 	}
-	
+
 	pEventXyears_df_list[[jj]] = pEventXyears_df
 }
 
@@ -181,7 +181,7 @@ for (jj in 1:ncrit) {
 
 
 # =====================================================
-# read the sun-spot data 
+# read the sun-spot data
 # =====================================================
 
 filename = paste0(data_dir,'/SN_ms_tot_V2.0.txt')
@@ -218,7 +218,7 @@ for (ii in 1:n1) {
     tmp1 = mean(-data[,'evnt'])
     tmp2 = sd(data[,'evnt'])
     tmp3 = sum(-data[,'evnt'])
-    
+
   stat_table[ii, c('dcx_mean', 'dxt_mean', 'dst_mean')] = tmp1
   stat_table[ii, c('dcx_std', 'dxt_std', 'dst_std')] = tmp2
   stat_table[ii, c('dcx_total', 'dxt_total', 'dst_total')] = tmp3
@@ -228,7 +228,7 @@ for (ii in 1:n1) {
 }
 
 
-# we need to remove the 'ALL' from the data frame before we add the ssn data 
+# we need to remove the 'ALL' from the data frame before we add the ssn data
 # will give it a different name
 
 pEventXyears_ssn_df = subset(pEventXyears_df_all , years != 'ALL')
@@ -241,10 +241,10 @@ pEventXyears_ssn_df$ssn_mean = rep(stat_table[, 'ssn_mean'], ncrit)
 
 mtit = 'Probability of Event Vs. Maximum SSN'
 
-pl.ssn = ggplot(pEventXyears_ssn_df) + geom_point(aes(x = ssn_max, y = median/100., color = xcrit),  size = 4) + 
+pl.ssn = ggplot(pEventXyears_ssn_df) + geom_point(aes(x = ssn_max, y = median/100., color = xcrit),  size = 4) +
   geom_errorbar(aes(x = ssn_max, ymin = low/100., ymax = high/100., color = xcrit), alpha = 0.8, width = 0.2) +
   scale_y_continuous(name = 'Probability') +
-  scale_x_continuous(name = 'Maximum SSN [per cycle]', breaks = seq(from=100, to = 300, by = 25)) + ggtitle(mtit) + 
+  scale_x_continuous(name = 'Maximum SSN [per cycle]', breaks = seq(from=100, to = 300, by = 25)) + ggtitle(mtit) +
   guides(color = guide_legend(title = "Xcrit [nT]"),size = guide_legend(14)) +
   theme(axis.text.x=element_text(size=14), axis.text.y=element_text(size=14), axis.title.x=element_text(size=14), axis.title.y=element_text(size=18), axis.title=element_text(size=14)) +
   geom_smooth(data = pEventXyears_ssn_df, method = 'lm', formula=(y~x), aes(x= ssn_max, y = median/100, color = xcrit), stat = 'smooth', span = 1)

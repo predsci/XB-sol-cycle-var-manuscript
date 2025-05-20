@@ -64,8 +64,8 @@ cycle_day = rep(15, ncycle)
 
 cycle_date = ISOdate(cycle_year, cycle_month, cycle_day, hour = rep(12, ncycle), tz = 'UTC')
 
-# there is a total of 9 complete cycles.  We are now in the 10th one 
-# we will analyse one by one and also anlayze the entire Dcx data set 
+# there is a total of 9 complete cycles.  We are now in the 10th one
+# we will analyse one by one and also anlayze the entire Dcx data set
 
 
 #  define some thresholds
@@ -78,14 +78,14 @@ xaxmin        <- 100
 date_breaks <- "10 years"
 
 # for standard Clauset analysis - use the same xcrit event value or if NULL uses the largest event for each cycle
-# For the Carrington event used 850 
+# For the Carrington event used 850
 
 inp.xcrit <- NULL # 565 # NULL
 dt <- 10
 yaxmax = 1
 # number of bootstraps
-boot = 500
-# Number of bootstrap to show 
+boot = 1e4
+# Number of bootstrap to show
 bootShow = 10
 
 continous <- TRUE
@@ -101,21 +101,21 @@ var_vec = c('Dcx')
 dataRaw <- df_dcx_total
 
 colnames(dataRaw) <- c('evnt_time', 'evnt')
-  
-# data frame for plotting raw data 
-  
+
+# data frame for plotting raw data
+
 df <- reshape::melt(dataRaw, id.var = "evnt_time")
-  
+
 # calculate the storms
 
 data_storms = calc_storms(dataRaw = dataRaw, evntMax = evntMax, evntThreshold = evntThreshold)
-  
-# data frame for plotting storms 
-  
+
+# data frame for plotting storms
+
 dfc <- reshape::melt(data_storms, id.var = "evnt_time")
-  
+
 df = data_storms
-  
+
 df_storm_dcx = dfc
 
 storm_table = data.frame(years = rep(0, ncycle), nstorms = rep(0, ncycle), nstorms_evd = rep(0, ncycle), threshold = rep(0, ncycle))
@@ -131,7 +131,7 @@ ytit1 <- make_ytit1(input.var=input.var)
 ytit11 <- make_ytit1(input.var=input.var)
 
 # =====================================================
-# Single cycle Clauset analysis for Dcx 
+# Single cycle Clauset analysis for Dcx
 # =====================================================
 
 ytit2 = "P(X>xmax)"
@@ -147,27 +147,27 @@ for (ii in 1:(ncycle-1)) {
 
   date_start = ISOdate(cycle_year[ii], cycle_month[ii], cycle_day[ii], hour = 12, tz = 'UTC')
   date_end   = ISOdate(cycle_year[ii1], cycle_month[ii1], cycle_day[ii1], hour = 12, tz = 'UTC')
-  data       = subset(df_storm_dcx, evnt_time >= date_start & evnt_time <= date_end)  	
- 
+  data       = subset(df_storm_dcx, evnt_time >= date_start & evnt_time <= date_end)
+
   cat('Start and End dates for cycle ', cycle_num[ii],'\n')
   print(date_start)
   print(date_end)
 
-  
+
   data_estimates <- get_estimates(abs(data$value), continous = continous)
   threshold = round(data_estimates$estimates[2])
-  
+
   xmin = threshold
 
   # Duration of data in seconds
   tSpan <-
     (as.numeric(data$evnt_time[length(data$evnt_time)]) - as.numeric(data$evnt_time[1])) /
     (86400 * 365)
-  
+
   ##
   ## Clauset Analysis
   ##
-  
+
   clauset.list <-
     clauset(
       data_estimates,
@@ -181,34 +181,34 @@ for (ii in 1:(ncycle-1)) {
       tSpan = tSpan,
       continous = continous
     )
-  
+
   df_emp_ccdf <- clauset.list$df_emp_ccdf
-  
+
   list_pl_ccdf <- clauset.list$pl_ccdf
-  
+
   list_ln_ccdf <- clauset.list$ln_ccdf
-  
+
   list_exp_ccdf <- clauset.list$exp_ccdf
-  
+
   ## pHat_df is retrieved
-  
+
   pHat_df <- clauset.list$pHat_df
-  
+
   xcrit <- clauset.list$xcrit
-  
+
   ##
   ## End Clauset Analysis
   ##
-  
+
   title_clauset = paste0('Cycle ',cycle_num[ii],' (',as.character(cycle_year[ii]),'-',as.character(cycle_year[ii1]),')')
 
  ## Plots of the traces
-  
+
   xaxmin = min(min(abs(df_emp_ccdf$x)), xmin)
 
   yaxmin = 1e-3
   yaxmax = 1
-  
+
   icount = icount + 1
   pl.clauset[[icount]] <-
     ggplot() + scale_y_continuous(
@@ -221,20 +221,20 @@ for (ii in 1:(ncycle-1)) {
       breaks = seq(from=100, to = 575, by = 50)) +
     ggtitle(title_clauset) +
     coord_cartesian(xlim = c(99, 580), ylim=c(yaxmin, yaxmax))
-    
+
   for (i in 1:bootShow) {
-    
+
     boot_exp_ccdf = list_exp_ccdf[[i]]
     boot_ln_ccdf  = list_ln_ccdf[[i]]
     boot_pl_ccdf  = list_pl_ccdf[[i]]
-    
+
     pl.clauset[[icount]] <-
       pl.clauset[[icount]] + geom_line(data = boot_exp_ccdf,
                                   aes(
                                     x = value,
                                     y = p_x,
-                                    colour = "Exponential"), alpha = 0.4) 
-    
+                                    colour = "Exponential"), alpha = 0.4)
+
     pl.clauset[[icount]] <-
       pl.clauset[[icount]] + geom_line(data = boot_ln_ccdf,
                                   aes(
@@ -246,8 +246,8 @@ for (ii in 1:(ncycle-1)) {
                                   aes(
                                     x = value,
                                     y = p_x,
-                                    colour = "Power-Law"), alpha = 0.4) 
-    
+                                    colour = "Power-Law"), alpha = 0.4)
+
     pl.clauset[[icount]] <-
       pl.clauset[[icount]] + geom_point(
         data = df_emp_ccdf,
@@ -256,7 +256,7 @@ for (ii in 1:(ncycle-1)) {
         alpha = 0.5,
         size = 2
       )
-    
+
     if (i == 1)
       pl.clauset[[icount]] <-
       pl.clauset[[icount]] + scale_colour_manual(values = c(
@@ -282,11 +282,19 @@ for (ii in 1:(ncycle-1)) {
         size = 1,
         linetype = "dashed"
       )
-    
+
+    pl.clauset[[icount]] <-
+      pl.clauset[[icount]] + theme(axis.text.x=element_text(size=14),
+                                     axis.text.y=element_text(size=14),
+                                     axis.title.x=element_text(size=14),
+                                     axis.title.y=element_text(size=14),
+                                     axis.title=element_text(size=14),
+                                   legend.text = element_text(size=12))
+
   }
-  
-  ## The density plot 
-  
+
+  ## The density plot
+
   icount = icount + 1
   pl.clauset[[icount]] <-
     ggplot() + geom_density(
@@ -312,10 +320,14 @@ for (ii in 1:(ncycle-1)) {
                              `Power-Law` = "red",
                              `Log-Normal` = "blue",
                              Exponential = "green"
-                           )) + theme(legend.position = "none",
-                                      legend.title = element_blank()) + ggtitle(title_clauset)
-  
-  
+                           )) + theme(axis.text.x=element_text(size=14),
+                                        axis.text.y=element_text(size=14),
+                                        axis.title.x=element_text(size=14),
+                                        axis.title.y=element_text(size=14),
+                                        axis.title=element_text(size=14),
+                                        legend.position = 'none') + ggtitle(title_clauset)
+
+
 }
 
 
